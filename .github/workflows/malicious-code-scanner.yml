@@ -21,10 +21,10 @@ jobs:
       - name: Get Git Diff
         id: get_diff
         run: |
-          if git rev-parse origin/main >/dev/null 2>&1; then
-            git fetch origin main
-            git diff origin/main...HEAD > diff.txt
-          else
+          git fetch origin main || true
+          git diff origin/main...HEAD > diff.txt || true
+          if [ ! -s diff.txt ]; then
+            echo "No diff from origin/main. Falling back to HEAD~1."
             git diff HEAD~1 > diff.txt
           fi
           echo "🔍 Git Diff Output:"
