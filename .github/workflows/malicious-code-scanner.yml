@@ -1,0 +1,75 @@
+name: Malicious Code Scanner
+
+on: [push]
+
+jobs:
+  scan-for-malicious-code:
+    name: Scan Commit for Malicious Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install OpenAI CLI
+        run: pip install openai
+
+      - name: Get Git Diff
+        id: get_diff
+        run: |
+          git fetch origin main
+          DIFF=$(git diff origin/main...HEAD)
+          echo "$DIFF" > diff.txt
+
+      - name: Analyze with OpenAI LLM
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          CODE="$(cat diff.txt)"
+          PROMPT="
+          You are a cybersecurity expert specializing in malware detection and secure DevOps practices.
+
+          Analyze the following code changes for signs of malicious behavior, focusing on:
+          1. Attempts to exfiltrate data (e.g., sending to external servers, writing sensitive data to disk)
+          2. Unauthorized access to system resources or environment variables
+          3. Introduction of hardcoded credentials or API keys
+          4. Suspicious use of eval, exec, subprocess, or shell commands
+          5. Abuse of networking, file I/O, or cryptographic libraries
+          6. Unusual changes in authentication or authorization logic
+          7. Unexpected telemetry, tracking, or logging behavior
+          8. Creation of persistence mechanisms or backdoors
+          9. Obfuscation or stealth techniques (e.g., base64, encoded strings)
+
+          For each issue found, provide:
+          1. Description
+          2. Severity (Critical, High, Medium, Low, Info)
+          3. Code line(s) if possible
+          4. Impact
+
+          Format the output as a JSON array of objects with this structure:
+
+          [
+            {
+              \"vulnerability_type\": \"Type\",
+              \"description\": \"Description\",
+              \"severity\": \"Severity\",
+              \"line_numbers\": [line numbers],
+              \"impact\": \"Impact\"
+            }
+          ]
+
+          If nothing suspicious is found, return an empty array: []
+
+          Here are the code changes:
+
+          \`\`\`diff
+          $CODE
+          \`\`\`"
+
+          ANALYSIS=$(openai chat.completions.create -m gpt-4 -t 600 -n 1 -g user -m "$PROMPT")
+          echo "🔍 OpenAI Analysis Output:"
+          echo "$ANALYSIS"
