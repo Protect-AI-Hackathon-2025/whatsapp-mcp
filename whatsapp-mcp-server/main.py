@@ -15,6 +15,8 @@ from whatsapp import (
     download_media as whatsapp_download_media
 )
 
+# test
+
 # Initialize FastMCP server
 mcp = FastMCP("whatsapp")
 
