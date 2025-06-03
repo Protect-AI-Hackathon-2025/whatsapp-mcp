@@ -43,59 +43,59 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           python3 - <<EOF
-          import os
-          from openai import OpenAI
+import os
+from openai import OpenAI
 
-          client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-          with open("diff.txt") as f:
-              code = f.read()
+with open("diff.txt") as f:
+    code = f.read()
 
-          prompt = f'''
-          You are a cybersecurity expert specializing in malware detection and secure DevOps practices.
+prompt = f'''
+You are a cybersecurity expert specializing in malware detection and secure DevOps practices.
 
-          Analyze the following code changes for signs of malicious behavior, focusing on:
-          1. Attempts to exfiltrate data (e.g., sending to external servers, writing sensitive data to disk)
-          2. Unauthorized access to system resources or environment variables
-          3. Introduction of hardcoded credentials or API keys
-          4. Suspicious use of eval, exec, subprocess, or shell commands
-          5. Abuse of networking, file I/O, or cryptographic libraries
-          6. Unusual changes in authentication or authorization logic
-          7. Unexpected telemetry, tracking, or logging behavior
-          8. Creation of persistence mechanisms or backdoors
-          9. Obfuscation or stealth techniques (e.g., base64, encoded strings)
+Analyze the following code changes for signs of malicious behavior, focusing on:
+1. Attempts to exfiltrate data (e.g., sending to external servers, writing sensitive data to disk)
+2. Unauthorized access to system resources or environment variables
+3. Introduction of hardcoded credentials or API keys
+4. Suspicious use of eval, exec, subprocess, or shell commands
+5. Abuse of networking, file I/O, or cryptographic libraries
+6. Unusual changes in authentication or authorization logic
+7. Unexpected telemetry, tracking, or logging behavior
+8. Creation of persistence mechanisms or backdoors
+9. Obfuscation or stealth techniques (e.g., base64, encoded strings)
 
-          For each issue found, provide:
-          1. Description
-          2. Severity (Critical, High, Medium, Low, Info)
-          3. Code line(s) if possible
-          4. Impact
+For each issue found, provide:
+1. Description
+2. Severity (Critical, High, Medium, Low, Info)
+3. Code line(s) if possible
+4. Impact
 
-          Format the output as a JSON array of objects with this structure:
+Format the output as a JSON array of objects with this structure:
 
-          [
-            {{
-              "vulnerability_type": "Type",
-              "description": "Description",
-              "severity": "Severity",
-              "line_numbers": [line numbers],
-              "impact": "Impact"
-            }}
-          ]
+[
+  {{
+    "vulnerability_type": "Type",
+    "description": "Description",
+    "severity": "Severity",
+    "line_numbers": [line numbers],
+    "impact": "Impact"
+  }}
+]
 
-          If nothing suspicious is found, return an empty array: []
+If nothing suspicious is found, return an empty array: []
 
-          Here are the code changes:
+Here are the code changes:
 
-          ```diff
-          {code}
-          ```'''
+```diff
+{code}
+```'''
 
-          response = client.chat.completions.create(
-              model="gpt-4",
-              messages=[{"role": "user", "content": prompt}]
-          )
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": prompt}]
+)
 
-          print("🔍 OpenAI Analysis Output:")
-          print(response.choices[0].message.content)
-          EOF
+print("🔍 OpenAI Analysis Output:")
+print(response.choices[0].message.content)
+EOF
