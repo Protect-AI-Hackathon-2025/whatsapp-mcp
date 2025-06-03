@@ -47,8 +47,10 @@ jobs:
 
           with open("diff.txt") as f:
               code = f.read()
+
           print("🧠 Loaded diff:")
           print(code)
+
           prompt = (
               "You are a cybersecurity expert specializing in malware detection and secure DevOps practices.\n\n"
               "Analyze the following code changes for signs of malicious behavior, focusing on:\n"
@@ -78,9 +80,9 @@ jobs:
               "]\n\n"
               "If nothing suspicious is found, return an empty array: []\n\n"
               "Here are the code changes:\n\n"
-              "```diff\n"
+              "<diff>\n"
               + code +
-              "\n```"
+              "</diff>\n"
           )
           print("🧠 Prompt to OpenAI:")
           print(prompt)
