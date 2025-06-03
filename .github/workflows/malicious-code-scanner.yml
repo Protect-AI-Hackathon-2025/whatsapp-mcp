@@ -21,9 +21,12 @@ jobs:
       - name: Get Git Diff
         id: get_diff
         run: |
-          git fetch origin main
-          DIFF=$(git diff origin/main...HEAD)
-          echo "$DIFF" > diff.txt
+          if git rev-parse origin/main >/dev/null 2>&1; then
+            git fetch origin main
+            git diff origin/main...HEAD > diff.txt
+          else
+            git diff HEAD~1 > diff.txt
+          fi
 
       - name: Analyze with OpenAI LLM
         env:
@@ -31,12 +34,12 @@ jobs:
         run: |
           python3 - <<EOF
           import os
-          import openai
+          from openai import OpenAI
 
-          openai.api_key = os.getenv("OPENAI_API_KEY")
+          client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
           with open("diff.txt") as f:
-              code = f.read()
+              diff = f.read()
 
           prompt = f'''
           You are a cybersecurity expert specializing in malware detection and secure DevOps practices.
@@ -75,10 +78,10 @@ jobs:
           Here are the code changes:
 
           ```diff
-          {code}
+          {diff}
           ```'''
 
-          response = openai.ChatCompletion.create(
+          response = client.chat.completions.create(
               model="gpt-4",
               messages=[{"role": "user", "content": prompt}]
           )
