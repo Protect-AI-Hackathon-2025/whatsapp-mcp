@@ -22,10 +22,14 @@ jobs:
         id: get_diff
         run: |
           git fetch origin main || true
-          git diff origin/main...HEAD > diff.txt || true
-          if [ ! -s diff.txt ]; then
-            echo "No diff from origin/main. Falling back to HEAD~1."
+          if git merge-base origin/main HEAD >/dev/null 2>&1; then
+            git diff origin/main...HEAD > diff.txt
+          elif git rev-parse HEAD~1 >/dev/null 2>&1; then
+            echo "No merge base with origin/main. Falling back to HEAD~1."
             git diff HEAD~1 > diff.txt
+          else
+            echo "No merge base and no previous commit. Writing placeholder diff."
+            echo "# No previous commit to diff against." > diff.txt
           fi
           echo "🔍 Git Diff Output:"
           cat diff.txt
