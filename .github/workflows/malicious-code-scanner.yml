@@ -51,6 +51,9 @@ jobs:
           with open("diff.txt") as f:
               code = f.read()
 
+          print("🔧 Loaded diff content:")
+          print(code)
+
           prompt = f'''
           You are a cybersecurity expert specializing in malware detection and secure DevOps practices.
 
