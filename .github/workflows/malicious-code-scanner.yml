@@ -48,9 +48,6 @@ jobs:
           with open("diff.txt") as f:
               code = f.read()
 
-          print("🧠 Loaded diff:")
-          print(code)
-
           prompt = (
               "You are a cybersecurity expert specializing in malware detection and secure DevOps practices.\n\n"
               "Analyze the following code changes for signs of malicious behavior, focusing on:\n"
@@ -68,7 +65,7 @@ jobs:
               "2. Severity (Critical, High, Medium, Low, Info)\n"
               "3. Code line(s) if possible\n"
               "4. Impact\n\n"
-              "Format the output as a JSON array of objects with this structure:\n\n"
+              "Format the output as JUST A JSON array (with no other text) of objects with this structure:\n\n"
               "[\n"
               "  {\n"
               '    \"vulnerability_type\": \"Type\",\n'
@@ -84,8 +81,6 @@ jobs:
               + code +
               "</diff>\n"
           )
-          print("🧠 Prompt to OpenAI:")
-          print(prompt)
 
           response = client.chat.completions.create(
               model="gpt-4",
