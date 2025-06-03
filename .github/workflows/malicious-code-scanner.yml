@@ -29,8 +29,16 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          CODE="$(cat diff.txt)"
-          PROMPT="
+          python3 - <<EOF
+          import os
+          import openai
+
+          openai.api_key = os.getenv("OPENAI_API_KEY")
+
+          with open("diff.txt") as f:
+              code = f.read()
+
+          prompt = f'''
           You are a cybersecurity expert specializing in malware detection and secure DevOps practices.
 
           Analyze the following code changes for signs of malicious behavior, focusing on:
@@ -53,23 +61,28 @@ jobs:
           Format the output as a JSON array of objects with this structure:
 
           [
-            {
-              \"vulnerability_type\": \"Type\",
-              \"description\": \"Description\",
-              \"severity\": \"Severity\",
-              \"line_numbers\": [line numbers],
-              \"impact\": \"Impact\"
-            }
+            {{
+              "vulnerability_type": "Type",
+              "description": "Description",
+              "severity": "Severity",
+              "line_numbers": [line numbers],
+              "impact": "Impact"
+            }}
           ]
 
           If nothing suspicious is found, return an empty array: []
 
           Here are the code changes:
 
-          \`\`\`diff
-          $CODE
-          \`\`\`"
+          ```diff
+          {code}
+          ```'''
 
-          ANALYSIS=$(openai chat.completions.create -m gpt-4 -t 600 -n 1 -g user -m "$PROMPT")
-          echo "🔍 OpenAI Analysis Output:"
-          echo "$ANALYSIS"
+          response = openai.ChatCompletion.create(
+              model="gpt-4",
+              messages=[{"role": "user", "content": prompt}]
+          )
+
+          print("🔍 OpenAI Analysis Output:")
+          print(response.choices[0].message.content)
+          EOF
