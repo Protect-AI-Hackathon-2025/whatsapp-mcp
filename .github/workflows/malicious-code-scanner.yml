@@ -35,9 +35,6 @@ jobs:
             echo "# No previous commit to diff against." > diff.txt
           fi
 
-          echo "🔍 Git Diff Output:"
-          cat diff.txt
-
       - name: Analyze with OpenAI LLM
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -50,9 +47,6 @@ jobs:
 
           with open("diff.txt") as f:
               code = f.read()
-
-          print("🔧 Loaded diff content:")
-          print(code)
 
           prompt = (
               "You are a cybersecurity expert specializing in malware detection and secure DevOps practices.\n\n"
@@ -87,6 +81,8 @@ jobs:
               + code +
               "\n```"
           )
+          print("🧠 Prompt to OpenAI:")
+          print(prompt)
 
           response = client.chat.completions.create(
               model="gpt-4",
