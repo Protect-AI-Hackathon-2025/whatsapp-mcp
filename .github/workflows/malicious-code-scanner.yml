@@ -65,7 +65,7 @@ jobs:
               "2. Severity (Critical, High, Medium, Low, Info)\n"
               "3. Code line(s) if possible\n"
               "4. Impact\n\n"
-              "Format the output as JUST A JSON array (with no other text) of objects with this structure:\n\n"
+              "Format the output as A JSON array of objects with this structure:\n\n"
               "[\n"
               "  {\n"
               '    \"vulnerability_type\": \"Type\",\n'
@@ -84,7 +84,8 @@ jobs:
 
           response = client.chat.completions.create(
               model="gpt-4",
-              messages=[{"role": "user", "content": prompt}]
+              messages=[{"role": "user", "content": prompt}],
+              text.format={"type": "json_object"}
           )
 
           print("🔍 OpenAI Analysis Output:")
