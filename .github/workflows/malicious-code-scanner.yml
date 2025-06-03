@@ -27,6 +27,8 @@ jobs:
           else
             git diff HEAD~1 > diff.txt
           fi
+          echo "🔍 Git Diff Output:"
+          cat diff.txt
 
       - name: Analyze with OpenAI LLM
         env:
