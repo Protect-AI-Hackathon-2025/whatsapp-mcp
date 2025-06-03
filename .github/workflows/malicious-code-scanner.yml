@@ -39,7 +39,7 @@ jobs:
           client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
           with open("diff.txt") as f:
-              diff = f.read()
+              code = f.read()
 
           prompt = f'''
           You are a cybersecurity expert specializing in malware detection and secure DevOps practices.
@@ -78,7 +78,7 @@ jobs:
           Here are the code changes:
 
           ```diff
-          {diff}
+          {code}
           ```'''
 
           response = client.chat.completions.create(
